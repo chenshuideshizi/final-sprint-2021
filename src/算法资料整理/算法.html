@@ -94,14 +94,43 @@
     </script>
 
     
-    <h2>在排序数组中查找元素的第一个和最后一个位置</h2>
+    <h2>6. 在排序数组中查找元素的第一个和最后一个位置</h2>
     <script>
+        // 方法一： findIndex、lastIndexOf
+
+        // 方法二：
         // https://mp.weixin.qq.com/s/YOMvXPt3ODSAqNdJlV90lA
     </script>
 
-    <h2>简述二分查找算法与时间复杂度，并实现一个二分查找算法</h2>
+    <h2>7. 简述二分查找算法与时间复杂度，并实现一个二分查找算法</h2>
 
     <script>
+        function binarySearch(items, item) {
+            let low = 0
+            let high = items.length - 1
+
+            while(low <= high) {
+                let mid = Math.floor((low + high) / 2)
+                if (item < items[mid]) {
+                    high = mid - 1
+                } else if (item > item[mid]) {
+                    low = mid + 1
+                } else {
+                    return mid
+                }
+            }
+
+            return -1
+        }
+
+        // 时间复杂度：O(logn)
+        // 空间复杂度：O(1)
+
+        // 二分查找易错点：
+        // 循环退出条件是low <= high ，注意是 <=
+        // mid 的取值是 Math.floor((low+high)/2)
+        // low high 每次更新的时候，low = mid + 1 high = mid - 1
+
         // https://mp.weixin.qq.com/s/MeabNl-4iS2tpQm5UtXtiw
     </script>
 </body>

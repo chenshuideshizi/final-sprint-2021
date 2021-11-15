@@ -207,16 +207,160 @@ user.name = 'John' // SET key=name value=John
 console.log(user.name) // GET key=name value=John // John
 delete user.name // DELETE key=name value=
 ```
-### 5. 你了解虚拟Dom吗，能说一下优缺点吗
+### 5. 你了解虚拟DOM吗，能说一下优缺点吗
 
-对于真实DOM的抽象，用嵌套对象表示，用属性来来描述节点，最终通过一系列的操作映射到真实dom上
+虚拟 DOM 是对真实DOM的抽象，用嵌套对象表示，用属性来来描述节点，最终通过一系列的操作映射到真实dom上
+
+#### 优点
+
+1. 保证性能的下限
+
+在不进行手动优化的前提下，也能提供过得去的性能。
+
+2. 无需手动操作 dom
+
+3. 跨平台
+
+虚拟 dom 本质上其实就是一个js对象，它可以很方便的跨平台，比如服务端渲染、uniapp
+
+#### 缺点
+
+* 首次渲染大量 dom 的时候，由于多了一层虚拟 dom 的计算，会比 innerHTML 的插入速度慢
+* 做一些针对性的优化的时候，真实 dom 的操作还是更快一点
+
 
 ### 5. 给你一段数据结构，将其转为真实dom
+
+```js
+const vnode = {
+  tag: 'DIV',
+  attrs: {
+    id: 'app'
+  },
+  children: [
+    {
+      tag: 'SPAN',
+      children: [
+        {
+          tag: 'A',
+          children: []
+        }
+      ]
+    },
+    {
+      tag: 'SPAN',
+      children: [
+        {
+          tag: 'A',
+          children: []
+        },
+        {
+          tag: 'A',
+          children: []
+        }
+      ]
+    }
+  ]
+}
+
+function render(vnode) {
+
+}
+```
+
+**实现**
+
+```js
+function render (vnode) {
+  if (typeof vnode === 'number') {
+    vnode = String(vnode)
+  }
+
+  if (typeof vnode === 'string') {
+    return document.createTextNode(vnode)
+  }
+
+  const element = document.createElement(vnode.tag)
+
+  if (vnode.attrs) {
+    Object.keys(vnode.attrs).forEach(attrKey => {
+      element.setAttribute(attrKey, vnode.attrs[attrKey])
+    })
+  }
+
+  if (vnode.children) {
+    vnode.children.forEach(childNode => {
+      element.appendChild(render(childNode))
+    })
+  }
+  return element
+}
+```
 
 
 ### 6. Symbol
 
+1. 用来解决属性名冲突的问题，构造唯一的属性名或变量
+
+2. 私有属性
+
+
+```js
+function getObj() {
+  const symbol = Symbol('test')
+
+  const obj = {}
+
+  obj[symbol] = 'test'
+
+  return obj
+}
+```
+
+
 ### 7. 具体如何让一个对象可遍历
+
+```js
+const obj = {
+  count: 0
+}
+
+for (const item of obj) {
+  console.log(item) // 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+}
+```
+
+**实现**
+
+```js
+const obj = {
+  count: 0,
+  [Symbol.iterator]: () => {
+    return {
+      next: () => {
+        obj.count++
+
+        if (obj.count <= 10) {
+          return ({
+            value: obj.count,
+            done: false
+          })
+        } else {
+          return ({
+            value: undefined,
+            done: true
+          })
+        }
+      }
+    }
+  }
+}
+
+for(const item of obj) {
+  console.log(item)
+}
+
+```
 
 ### 8. JONS.stringify 会忽略 symbol，除了这个，还会忽略什么
 
@@ -229,6 +373,42 @@ qus: 确定 stringify 会报错，而不是 parse 报错
 
 方法一：JSON.parse(JSON.stringify(ob))
 
+方法二：
+
+```js
+function deepClone(obj, hash = new WeakMap) {
+  if (obj === null) {
+    return null
+  }
+
+  if (obj instanceof Date) {
+    return new Date(obj)
+  }
+
+  if (obj instanceof RegExp) {
+    return new RegExp(obj)
+  }
+
+  if (typeof obj !== 'object') {
+    return obj
+  }
+
+  if (hash.has(obj)) {
+    return obj.get(obj)
+  }
+
+  const resObj = Array.isArray(obj) ? [] : {}
+  hash.set(obj, resObj)
+
+  Reflect.ownKeys(obj).forEach(key => {
+    resObj[key] = deepClone(obj[key], hash)
+  })
+
+  return resObj
+}
+```
+
+
 // 使用了判断数据类型
  === 
  instanceof 
@@ -237,4 +417,24 @@ qus: 确定 stringify 会报错，而不是 parse 报错
  Object.prorotype.toString.call(obj) 
  constructor
 
-实现一个instanceof
+**实现一个instanceof**
+
+```js
+function instanceOf(left, right) {
+  if (typeof left !== 'object' || left === null) {
+    return false
+  }
+
+  while(true) {
+    if (left === null) {
+      return false
+    }
+
+    if (left.__proto__ === right.prototype) {
+      return true
+    }
+    
+    left = left.__proto__
+  }
+}
+```

@@ -1,0 +1,6 @@
+- webpack是怎么根据模板生成代码的，怎么处理export模块化的？
+- webpack中的NormalModuleFactory都作了那些事情？
+- webpack中的SourceMap是怎么实现的？
+- webpack中的loader是怎么被解析的，怎么运行的？
+- webpack中的hrm是怎么实现的？
+- webpack中是怎么组织chunk的？

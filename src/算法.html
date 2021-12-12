@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>算法</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        body {
+          
+        }
+        code {
+          font-size: 14px;
+          letter-spacing: -0.2px;
+          line-height: 19px;
+          margin: 0px;
+          padding: 8px 12px;
+          white-space: pre;
+          border: none;
+          background: rgba(var(--dsw-fill-quaternary-rgba));
+          overflow-x: auto;
+          display: block;
+          tab-size: 4;
+          word-wrap: break-word;
+          word-break: break-all;
+        }
+        .layout {
+          padding: 20px
+        }
+    </style>
+</head>
+
+<body>
+  <div class="layout">
+    <div>
+      <h3>无重复字符的最长子串(滑动窗口)</h3>
+    <code>
+var lengthOfLongestSubstring = function(s) {
+  // 哈希集合，记录每个字符是否出现过
+  const occ = new Set();
+  const n = s.length;
+  // 右指针，初始值为 -1，相当于我们在字符串的左边界的左侧，还没有开始移动
+  let rk = -1, ans = 0;
+  for (let i = 0; i < n; ++i) {
+      if (i != 0) {
+          // 左指针向右移动一格，移除一个字符
+          occ.delete(s.charAt(i - 1));
+      }
+      while (rk + 1 < n && !occ.has(s.charAt(rk + 1))) {
+          // 不断地移动右指针
+          occ.add(s.charAt(rk + 1));
+          ++rk;
+      }
+      // 第 i 到 rk 个字符是一个极长的无重复字符子串
+      ans = Math.max(ans, rk - i + 1);
+  }
+  return ans;
+};
+    </code>
+
+    </div>
+
+    <div>
+      <h3>寻找两个正序数组的中位数(二分查找)</h3>
+      <code>
+class Solution {
+  public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+      int length1 = nums1.length, length2 = nums2.length;
+      int totalLength = length1 + length2;
+      if (totalLength % 2 == 1) {
+          int midIndex = totalLength / 2;
+          double median = getKthElement(nums1, nums2, midIndex + 1);
+          return median;
+      } else {
+          int midIndex1 = totalLength / 2 - 1, midIndex2 = totalLength / 2;
+          double median = (getKthElement(nums1, nums2, midIndex1 + 1) 
+                            + getKthElement(nums1, nums2, midIndex2 + 1)) / 2.0;
+          return median;
+      }
+  }
+  public int getKthElement(int[] nums1, int[] nums2, int k) {
+      /* 主要思路：要找到第 k (k>1) 小的元素，
+      /* 那么就取 pivot1 = nums1[k/2-1] 和 pivot2 = nums2[k/2-1] 进行比较
+       * 这里的 "/" 表示整除
+       * nums1 中小于等于 pivot1 的元素有 nums1[0 .. k/2-2] 共计 k/2-1 个
+       * nums2 中小于等于 pivot2 的元素有 nums2[0 .. k/2-2] 共计 k/2-1 个
+       * 取 pivot = min(pivot1, pivot2)，
+       /* 两个数组中小于等于 pivot 的元素共计不会超过 (k/2-1) + (k/2-1) <= k-2 个
+       * 这样 pivot 本身最大也只能是第 k-1 小的元素
+       * 如果 pivot = pivot1，那么 nums1[0 .. k/2-1] 都不可能是第 k 小的元素。
+       /* 把这些元素全部 "删除"，剩下的作为新的 nums1 数组
+       * 如果 pivot = pivot2，那么 nums2[0 .. k/2-1] 都不可能是第 k 小的元素。
+       /* 把这些元素全部 "删除"，剩下的作为新的 nums2 数组
+       * 由于我们 "删除" 了一些元素（这些元素都比第 k 小的元素要小），因此需要修改 k 的值，减去删除的数的个数
+       */
+      int length1 = nums1.length, length2 = nums2.length;
+      int index1 = 0, index2 = 0;
+      int kthElement = 0;
+      while (true) {
+          // 边界情况
+          if (index1 == length1) {
+              return nums2[index2 + k - 1];
+          }
+          if (index2 == length2) {
+              return nums1[index1 + k - 1];
+          }
+          if (k == 1) {
+              return Math.min(nums1[index1], nums2[index2]);
+          }
+          
+          // 正常情况
+          int half = k / 2;
+          int newIndex1 = Math.min(index1 + half, length1) - 1;
+          int newIndex2 = Math.min(index2 + half, length2) - 1;
+          int pivot1 = nums1[newIndex1], pivot2 = nums2[newIndex2];
+          if (pivot1 <= pivot2) {
+              k -= (newIndex1 - index1 + 1);
+              index1 = newIndex1 + 1;
+          } else {
+              k -= (newIndex2 - index2 + 1);
+              index2 = newIndex2 + 1;
+          }
+      }
+  }
+}
+      </code>
+    </div>
+    <div>
+      <h3>盛最多水的容器(双指针)</h3>
+      <code>
+public class Solution {
+  public int maxArea(int[] height) {
+      int l = 0, r = height.length - 1;
+      int ans = 0;
+      while (l < r) {
+          int area = Math.min(height[l], height[r]) * (r - l);
+          ans = Math.max(ans, area);
+          if (height[l] <= height[r]) {
+              ++l;
+          }
+          else {
+              --r;
+          }
+      }
+      return ans;
+  }
+}      </code>
+    </div>
+    <div>
+      <h3>三数之和(排序 + 双指针)</h3>
+<code>
+class Solution {
+   public List<List<Integer>> threeSum(int[] nums) {
+       int n = nums.length;
+       Arrays.sort(nums);
+       List<List<Integer>> ans = new ArrayList<List<Integer>>();
+       // 枚举 a
+       for (int first = 0; first < n; ++first) {
+           // 需要和上一次枚举的数不相同
+           if (first > 0 && nums[first] == nums[first - 1]) {
+               continue;
+           }
+           // c 对应的指针初始指向数组的最右端
+           int third = n - 1;
+           int target = -nums[first];
+           // 枚举 b
+           for (int second = first + 1; second < n; ++second) {
+               // 需要和上一次枚举的数不相同
+               if (second > first + 1 && nums[second] == nums[second - 1]) {
+                   continue;
+               }
+               // 需要保证 b 的指针在 c 的指针的左侧
+               while (second < third && nums[second] + nums[third] > target) {
+                   --third;
+               }
+               // 如果指针重合，随着 b 后续的增加
+               // 就不会有满足 a+b+c=0 并且 b<c 的 c 了，可以退出循环
+               if (second == third) {
+                   break;
+               }
+               if (nums[second] + nums[third] == target) {
+                   List<Integer> list = new ArrayList<Integer>();
+                   list.add(nums[first]);
+                   list.add(nums[second]);
+                   list.add(nums[third]);
+                   ans.add(list);
+               }
+           }
+       }
+       return ans;
+   }
+}
+</code>
+    </div>
+    <div>
+      <h3>搜索旋转排序数组(二分查找)</h3>
+      <code>
+class Solution {
+  public int search(int[] nums, int target) {
+      int n = nums.length;
+      if (n == 0) {
+          return -1;
+      }
+      if (n == 1) {
+          return nums[0] == target ? 0 : -1;
+      }
+      int l = 0, r = n - 1;
+      while (l <= r) {
+          int mid = (l + r) / 2;
+          if (nums[mid] == target) {
+              return mid;
+          }
+          if (nums[0] <= nums[mid]) {
+              if (nums[0] <= target && target < nums[mid]) {
+                  r = mid - 1;
+              } else {
+                  l = mid + 1;
+              }
+          } else {
+              if (nums[mid] < target && target <= nums[n - 1]) {
+                  l = mid + 1;
+              } else {
+                  r = mid - 1;
+              }
+          }
+      }
+      return -1;
+  }
+}      </code>
+    </div>
+    <div>
+      <h3>在排序数组中查找元素的第一个和最后一个位置(二分查找)</h3>
+      <code>
+const binarySearch = (nums, target, lower) => {
+    let left = 0, right = nums.length - 1, ans = nums.length;
+    while (left <= right) {
+        const mid = Math.floor((left + right) / 2);
+        if (nums[mid] > target || (lower && nums[mid] >= target)) {
+            right = mid - 1;
+            ans = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+    return ans;
+}
+
+var searchRange = function(nums, target) {
+    let ans = [-1, -1];
+    const leftIdx = binarySearch(nums, target, true);
+    const rightIdx = binarySearch(nums, target, false) - 1;
+    if (leftIdx <= rightIdx 
+        && rightIdx < nums.length && nums[leftIdx] === target 
+        && nums[rightIdx] === target
+    ) {
+        ans = [leftIdx, rightIdx];
+    } 
+    return ans;
+};
+      </code>
+    </div>
+    <div>
+      <h3>接雨水(双指针)</h3>
+      <code>
+var trap = function(height) {
+    let ans = 0;
+    let left = 0, right = height.length - 1;
+    let leftMax = 0, rightMax = 0;
+    while (left < right) {
+        leftMax = Math.max(leftMax, height[left]);
+        rightMax = Math.max(rightMax, height[right]);
+        if (height[left] < height[right]) {
+            ans += leftMax - height[left];
+            ++left;
+        } else {
+            ans += rightMax - height[right];
+            --right;
+        }
+    }
+    return ans;
+};
+      </code>
+    </div>
+    <div>
+      <h3>颜色分类(双指针)</h3>
+      <code>
+class Solution {
+    public void sortColors(int[] nums) {
+        int n = nums.length;
+        int p0 = 0, p1 = 0;
+        for (int i = 0; i < n; ++i) {
+            if (nums[i] == 1) {
+                int temp = nums[i];
+                nums[i] = nums[p1];
+                nums[p1] = temp;
+                ++p1;
+            } else if (nums[i] == 0) {
+                int temp = nums[i];
+                nums[i] = nums[p0];
+                nums[p0] = temp;
+                if (p0 < p1) {
+                    temp = nums[i];
+                    nums[i] = nums[p1];
+                    nums[p1] = temp;
+                }
+                ++p0;
+                ++p1;
+            }
+        }
+    }
+}
+      </code>
+    </div>
+    <div>
+      <h3>最小覆盖子串(滑动窗口)</h3>
+  <code>
+  class Solution {
+      Map<Character, Integer> ori = new HashMap<Character, Integer>();
+      Map<Character, Integer> cnt = new HashMap<Character, Integer>();
+  
+      public String minWindow(String s, String t) {
+          int tLen = t.length();
+          for (int i = 0; i < tLen; i++) {
+              char c = t.charAt(i);
+              ori.put(c, ori.getOrDefault(c, 0) + 1);
+          }
+          int l = 0, r = -1;
+          int len = Integer.MAX_VALUE, ansL = -1, ansR = -1;
+          int sLen = s.length();
+          while (r < sLen) {
+              ++r;
+              if (r < sLen && ori.containsKey(s.charAt(r))) {
+                  cnt.put(s.charAt(r), cnt.getOrDefault(s.charAt(r), 0) + 1);
+              }
+              while (check() && l <= r) {
+                  if (r - l + 1 < len) {
+                      len = r - l + 1;
+                      ansL = l;
+                      ansR = l + len;
+                  }
+                  if (ori.containsKey(s.charAt(l))) {
+                      cnt.put(s.charAt(l), cnt.getOrDefault(s.charAt(l), 0) - 1);
+                  }
+                  ++l;
+              }
+          }
+          return ansL == -1 ? "" : s.substring(ansL, ansR);
+      }
+  
+      public boolean check() {
+          Iterator iter = ori.entrySet().iterator(); 
+          while (iter.hasNext()) { 
+              Map.Entry entry = (Map.Entry) iter.next(); 
+              Character key = (Character) entry.getKey(); 
+              Integer val = (Integer) entry.getValue(); 
+              if (cnt.getOrDefault(key, 0) < val) {
+                  return false;
+              }
+          } 
+          return true;
+      }
+  }
+      </code>
+    </div>
+    <div>
+      <h3>寻找重复数(二分查找)</h3>
+      <code>
+var findDuplicate = function(nums) {
+    const n = nums.length;
+    let l = 1, r = n - 1, ans = -1;
+    while (l <= r) {
+        let mid = (l + r) >> 1;
+        let cnt = 0;
+        for (let i = 0; i < n; ++i) {
+            cnt += nums[i] <= mid;
+        }
+        if (cnt <= mid) {
+            l = mid + 1;
+        } else {
+            r = mid - 1;
+            ans = mid;
+        }
+    }
+    return ans;
+};
+      </code>
+    </div>
+    <div>
+      <h3>找到字符串中所有字母异位词(滑动窗口)</h3>
+<code>
+var findAnagrams = function(s, p) {
+    const sLen = s.length, pLen = p.length;
+
+    if (sLen < pLen) {
+        return [];
+    }
+
+    const ans = [];
+    const sCount = new Array(26).fill(0);
+    const pCount = new Array(26).fill(0);
+    for (let i = 0; i < pLen; ++i) {
+        ++sCount[s[i].charCodeAt() - 'a'.charCodeAt()];
+        ++pCount[p[i].charCodeAt() - 'a'.charCodeAt()];
+    }
+
+    if (sCount.toString() === pCount.toString()) {
+        ans.push(0);
+    }
+
+    for (let i = 0; i < sLen - pLen; ++i) {
+        --sCount[s[i].charCodeAt() - 'a'.charCodeAt()];
+        ++sCount[s[i + pLen].charCodeAt() - 'a'.charCodeAt()];
+
+        if (sCount.toString() === pCount.toString()) {
+            ans.push(i + 1);
+        }
+    }
+
+    return ans;
+};
+      </code>
+    </div>
+    <div>
+      <h3>移动零(双指针)</h3>
+<code>
+class Solution {
+    public void moveZeroes(int[] nums) {
+        int n = nums.length, left = 0, right = 0;
+        while (right < n) {
+            if (nums[right] != 0) {
+                swap(nums, left, right);
+                left++;
+            }
+            right++;
+        }
+    }
+
+    public void swap(int[] nums, int left, int right) {
+        int temp = nums[left];
+        nums[left] = nums[right];
+        nums[right] = temp;
+    }
+}
+      </code>
+    </div>
+    <div>
+<h3>搜索二维矩阵 II(二分查找)</h3>
+<code>
+var searchMatrix = function(matrix, target) {
+    for (const row of matrix) {
+        const index = search(row, target);
+        if (index >= 0) {
+            return true;
+        }
+    }
+    return false;
+};
+
+const search = (nums, target) => {
+    let low = 0, high = nums.length - 1;
+    while (low <= high) {
+        const mid = Math.floor((high - low) / 2) + low;
+        const num = nums[mid];
+        if (num === target) {
+            return mid;
+        } else if (num > target) {
+            high = mid - 1;
+        } else {
+            low = mid + 1;
+        }
+    }
+    return -1;
+}
+      </code>
+    </div>
+  </div>
+</body>
+
+</html>

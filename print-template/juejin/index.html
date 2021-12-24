@@ -1,3 +1,9 @@
+<!-- 
+  参考:
+  window.print() 前端实现网页打印详解
+  https://blog.csdn.net/qq_38128179/article/details/103344021 
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,7 +11,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>面试官： 来说一下如何串行执行多个Promise - 掘金</title>
+  <title></title>
   <link rel="stylesheet" href="./inline-style.css">
   <link rel="stylesheet" href="./style.css">
   <style>
@@ -16,9 +22,10 @@
   </style>
 
   <script>
-  
-    const title = `面试官： 来说一下如何串行执行多个Promise`
+    
+    const title = `面试官连环追问：数组拍平（扁平化） flat 方法实现`
     setTimeout(() => {
+      document.title = title
       document.querySelector('.article-title').innerText = title
     })
 
@@ -28,361 +35,327 @@
 <body style="padding-top: 20px;">
   <h1 class="article-title"></h1>
   <div class="article-content">
-    <div data-v-550e9bd2="" class="article-content" itemprop="articleBody">
-      <div class="markdown-body html">
-        <style>
-          .markdown-body {
-            word-break: break-word;
-            line-height: 1.75;
-            font-weight: 400;
-            font-size: 16px;
-            overflow-x: hidden;
-            color: #333
-          }
+    <!-- CONTENT START -->
 
-          .markdown-body h1,
-          .markdown-body h2,
-          .markdown-body h3,
-          .markdown-body h4,
-          .markdown-body h5,
-          .markdown-body h6 {
-            line-height: 1.5;
-            margin-top: 35px;
-            margin-bottom: 10px;
-            padding-bottom: 5px
-          }
+    <div class="markdown-body html"><style>.markdown-body{word-break:break-word;line-height:1.75;font-weight:400;font-size:16px;overflow-x:hidden;color:#333}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{line-height:1.5;margin-top:35px;margin-bottom:10px;padding-bottom:5px}.markdown-body h1{font-size:24px;margin-bottom:5px}.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{font-size:20px}.markdown-body h2{padding-bottom:12px;border-bottom:1px solid #ececec}.markdown-body h3{font-size:18px;padding-bottom:0}.markdown-body h6{margin-top:5px}.markdown-body p{line-height:inherit;margin-top:22px;margin-bottom:22px}.markdown-body img{max-width:100%}.markdown-body hr{border:none;border-top:1px solid #ddd;margin-top:32px;margin-bottom:32px}.markdown-body code{word-break:break-word;border-radius:2px;overflow-x:auto;background-color:#fff5f5;color:#ff502c;font-size:.87em;padding:.065em .4em}.markdown-body code,.markdown-body pre{font-family:Menlo,Monaco,Consolas,Courier New,monospace}.markdown-body pre{overflow:auto;position:relative;line-height:1.75}.markdown-body pre>code{font-size:12px;padding:15px 12px;margin:0;word-break:normal;display:block;overflow-x:auto;color:#333;background:#f8f8f8}.markdown-body a{text-decoration:none;color:#0269c8;border-bottom:1px solid #d1e9ff}.markdown-body a:active,.markdown-body a:hover{color:#275b8c}.markdown-body table{display:inline-block!important;font-size:12px;width:auto;max-width:100%;overflow:auto;border:1px solid #f6f6f6}.markdown-body thead{background:#f6f6f6;color:#000;text-align:left}.markdown-body tr:nth-child(2n){background-color:#fcfcfc}.markdown-body td,.markdown-body th{padding:12px 7px;line-height:24px}.markdown-body td{min-width:120px}.markdown-body blockquote{color:#666;padding:1px 23px;margin:22px 0;border-left:4px solid #cbcbcb;background-color:#f8f8f8}.markdown-body blockquote:after{display:block;content:""}.markdown-body blockquote>p{margin:10px 0}.markdown-body ol,.markdown-body ul{padding-left:28px}.markdown-body ol li,.markdown-body ul li{margin-bottom:0;list-style:inherit}.markdown-body ol li .task-list-item,.markdown-body ul li .task-list-item{list-style:none}.markdown-body ol li .task-list-item ol,.markdown-body ol li .task-list-item ul,.markdown-body ul li .task-list-item ol,.markdown-body ul li .task-list-item ul{margin-top:0}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-top:3px}.markdown-body ol li{padding-left:6px}.markdown-body .contains-task-list{padding-left:0}.markdown-body .task-list-item{list-style:none}@media (max-width:720px){.markdown-body h1{font-size:24px}.markdown-body h2{font-size:20px}.markdown-body h3{font-size:18px}}</style><h2 data-id="heading-0">前言</h2>
+<p>前段时间秋招面哔哩哔哩的时候，面试官问：如何实现 <code>flat</code> 方法？当时手写的并不完美，后来回盘复习，发现面试要求手写数组拍平（扁平化） <code>flat</code> 方法的面试官不在少数。其中包括：拼多多、小米、美团、滴滴、shopee、有赞等。手写 <code>flat</code> 方法是一道非常基础的面试题，通常出现在笔试或者第一轮面试当中，主要考察基本的手写代码的能力。今天就从了解 <code>flat</code> 特性到实现 <code>flat</code> 再到接住面试官的连环追问重新学习一遍数组拍平（扁平化） <code>flat</code> 方法吧。</p>
+<blockquote>
+<p><a target="_blank" href="https://link.juejin.cn?target=https%3A%2F%2Fgithub.com%2FNieZhuZhu%2FBlog" title="https://github.com/NieZhuZhu/Blog" ref="nofollow noopener noreferrer">Github 戳我</a></p>
+</blockquote>
+<h2 data-id="heading-1">一段代码总结 <code>Array.prototype.flat()</code>  特性</h2>
+<blockquote>
+<p>注：数组拍平方法 <code>Array.prototype.flat()</code>  也叫数组扁平化、数组拉平、数组降维。 本文统一叫：数组拍平</p>
+</blockquote>
+<pre><code lang="javascript" class="copyable"><span>const</span> animals = [<span>"🐷"</span>, [<span>"🐶"</span>, <span>"🐂"</span>], [<span>"🐎"</span>, [<span>"🐑"</span>, [<span>"🐲"</span>]], <span>"🐛"</span>]];
 
-          .markdown-body h1 {
-            font-size: 24px;
-            margin-bottom: 5px
-          }
+<span>// 不传参数时，默认“拉平”一层</span>
+animals.flat();
+<span>// ["🐷", "🐶", "🐂", "🐎", ["🐑", ["🐲"]], "🐛"]</span>
 
-          .markdown-body h2,
-          .markdown-body h3,
-          .markdown-body h4,
-          .markdown-body h5,
-          .markdown-body h6 {
-            font-size: 20px
-          }
+<span>// 传入一个整数参数，整数即“拉平”的层数</span>
+animals.flat(<span>2</span>);
+<span>// ["🐷", "🐶", "🐂", "🐎", "🐑", ["🐲"], "🐛"]</span>
 
-          .markdown-body h2 {
-            padding-bottom: 12px;
-            border-bottom: 1px solid #ececec
-          }
+<span>// Infinity 关键字作为参数时，无论多少层嵌套，都会转为一维数组</span>
+animals.flat(<span>Infinity</span>);
+<span>// ["🐷", "🐶", "🐂", "🐎", "🐑", "🐲", "🐛"]</span>
 
-          .markdown-body h3 {
-            font-size: 18px;
-            padding-bottom: 0
-          }
+<span>// 传入 &lt;=0 的整数将返回原数组，不“拉平”</span>
+animals.flat(<span>0</span>);
+animals.flat(<span>-10</span>);
+<span>// ["🐷", ["🐶", "🐂"], ["🐎", ["🐑", ["🐲"]], "🐛"]];</span>
 
-          .markdown-body h6 {
-            margin-top: 5px
-          }
+<span>// 如果原数组有空位，flat()方法会跳过空位。</span>
+[<span>"🐷"</span>, <span>"🐶"</span>, <span>"🐂"</span>, <span>"🐎"</span>,,].flat();
+<span>// ["🐷", "🐶", "🐂", "🐎"]</span>
 
-          .markdown-body p {
-            line-height: inherit;
-            margin-top: 22px;
-            margin-bottom: 22px
-          }
-
-          .markdown-body img {
-            max-width: 100%
-          }
-
-          .markdown-body hr {
-            border: none;
-            border-top: 1px solid #ddd;
-            margin-top: 32px;
-            margin-bottom: 32px
-          }
-
-          .markdown-body code {
-            word-break: break-word;
-            border-radius: 2px;
-            overflow-x: auto;
-            background-color: #fff5f5;
-            color: #ff502c;
-            font-size: .87em;
-            padding: .065em .4em
-          }
-
-          .markdown-body code,
-          .markdown-body pre {
-            font-family: Menlo, Monaco, Consolas, Courier New, monospace
-          }
-
-          .markdown-body pre {
-            overflow: auto;
-            position: relative;
-            line-height: 1.75
-          }
-
-          .markdown-body pre>code {
-            font-size: 12px;
-            padding: 15px 12px;
-            margin: 0;
-            word-break: normal;
-            display: block;
-            overflow-x: auto;
-            color: #333;
-            background: #f8f8f8
-          }
-
-          .markdown-body a {
-            text-decoration: none;
-            color: #0269c8;
-            border-bottom: 1px solid #d1e9ff
-          }
-
-          .markdown-body a:active,
-          .markdown-body a:hover {
-            color: #275b8c
-          }
-
-          .markdown-body table {
-            display: inline-block !important;
-            font-size: 12px;
-            width: auto;
-            max-width: 100%;
-            overflow: auto;
-            border: 1px solid #f6f6f6
-          }
-
-          .markdown-body thead {
-            background: #f6f6f6;
-            color: #000;
-            text-align: left
-          }
-
-          .markdown-body tr:nth-child(2n) {
-            background-color: #fcfcfc
-          }
-
-          .markdown-body td,
-          .markdown-body th {
-            padding: 12px 7px;
-            line-height: 24px
-          }
-
-          .markdown-body td {
-            min-width: 120px
-          }
-
-          .markdown-body blockquote {
-            color: #666;
-            padding: 1px 23px;
-            margin: 22px 0;
-            border-left: 4px solid #cbcbcb;
-            background-color: #f8f8f8
-          }
-
-          .markdown-body blockquote:after {
-            display: block;
-            content: ""
-          }
-
-          .markdown-body blockquote>p {
-            margin: 10px 0
-          }
-
-          .markdown-body ol,
-          .markdown-body ul {
-            padding-left: 28px
-          }
-
-          .markdown-body ol li,
-          .markdown-body ul li {
-            margin-bottom: 0;
-            list-style: inherit
-          }
-
-          .markdown-body ol li .task-list-item,
-          .markdown-body ul li .task-list-item {
-            list-style: none
-          }
-
-          .markdown-body ol li .task-list-item ol,
-          .markdown-body ol li .task-list-item ul,
-          .markdown-body ul li .task-list-item ol,
-          .markdown-body ul li .task-list-item ul {
-            margin-top: 0
-          }
-
-          .markdown-body ol ol,
-          .markdown-body ol ul,
-          .markdown-body ul ol,
-          .markdown-body ul ul {
-            margin-top: 3px
-          }
-
-          .markdown-body ol li {
-            padding-left: 6px
-          }
-
-          .markdown-body .contains-task-list {
-            padding-left: 0
-          }
-
-          .markdown-body .task-list-item {
-            list-style: none
-          }
-
-          @media (max-width:720px) {
-            .markdown-body h1 {
-              font-size: 24px
-            }
-
-            .markdown-body h2 {
-              font-size: 20px
-            }
-
-            .markdown-body h3 {
-              font-size: 18px
-            }
-          }
-        </style>
-        <p>最近接到了一次阿里的电话面试，问的问题都挺有意思的，而且看重的不仅仅是问题能否回答得上来，还得能明白背后的原理以及能否使用其他的方式实现</p>
-        <h2 data-id="heading-0">题目</h2>
-        <p>其中一个题很有印象，也很常见，题目： 如何串行执行多个Promise。</p>
-        <p>这要换在平时，经常看些面经或写点代码也能答出来： 使用<code>Array.prototype.reduce</code>、使用<code>async + 循环 + await</code>、
-          或者使用新出的<code>for await of</code></p>
-        <p>面试官： 那你还能说出使用其他的方式来实现吗？ for await of 的规则如何？</p>
-        <p>我： ... 卒</p>
-        <h2 data-id="heading-1">挑战</h2>
-        <p>好吧，我们今天的挑战就是用各种方式来实现这个需求， 为此，我准备了一段代码</p>
-        <pre><code lang="js" class="copyable"><span><span>function</span> <span>delay</span>(<span>time</span>) </span>{
-  <span>return</span> <span>new</span> <span>Promise</span>(<span>(<span>resolve, reject</span>) =&gt;</span> {
-    <span>console</span>.log(<span>`wait <span>${time}</span>s`</span>)
-    setTimeout(<span><span>()</span> =&gt;</span> {
-      <span>console</span>.log(<span>'execute'</span>);
-      resolve()
-    }, time * <span>1000</span>)
-  })
+<span class="copy-code-btn">复制代码</span></code></pre><h3 data-id="heading-2"><code>Array.prototype.flat()</code>  特性总结</h3>
+<ul>
+<li><code>Array.prototype.flat()</code> 用于将嵌套的数组“拉平”，变成一维的数组。该方法返回一个新数组，对原数据没有影响。</li>
+<li>不传参数时，默认“拉平”一层，可以传入一个整数，表示想要“拉平”的层数。</li>
+<li>传入 <code>&lt;=0</code> 的整数将返回原数组，不“拉平”</li>
+<li><code>Infinity</code> 关键字作为参数时，无论多少层嵌套，都会转为一维数组</li>
+<li>如果原数组有空位，<code>Array.prototype.flat()</code> 会跳过空位。</li>
+</ul>
+<h2 data-id="heading-3">面试官 N 连问</h2>
+<h3 data-id="heading-4">第一问：实现一个简单的数组拍平 <code>flat</code> 函数</h3>
+<p>首先，我们将花一点篇幅来探讨如何实现一个简单的数组拍平 <code>flat</code> 函数，详细介绍多种实现的方案，然后再尝试接住面试官的连环追问。</p>
+<h4 data-id="heading-5">实现思路</h4>
+<p>如何实现呢，思路非常简单：实现一个有数组拍平功能的 <code>flat</code> 函数，<strong>我们要做的就是在数组中找到是数组类型的元素，然后将他们展开</strong>。这就是实现数组拍平 <code>flat</code> 方法的关键思路。</p>
+<p>有了思路，我们就需要解决实现这个思路需要克服的困难：</p>
+<ul>
+<li><strong>第一个要解决的就是遍历数组的每一个元素；</strong></li>
+<li><strong>第二个要解决的就是判断元素是否是数组；</strong></li>
+<li><strong>第三个要解决的就是将数组的元素展开一层；</strong></li>
+</ul>
+<h4 data-id="heading-6">遍历数组的方案</h4>
+<p>遍历数组并取得数组元素的方法非常之多，<strong>包括且不限于下面几种</strong>：</p>
+<ul>
+<li><code>for 循环</code></li>
+<li><code>for...of</code></li>
+<li><code>for...in</code></li>
+<li><code>forEach()</code></li>
+<li><code>entries()</code></li>
+<li><code>keys()</code></li>
+<li><code>values()</code></li>
+<li><code>reduce()</code></li>
+<li><code>map()</code></li>
+</ul>
+<pre><code lang="javascript" class="copyable"><span>const</span> arr = [<span>1</span>, <span>2</span>, <span>3</span>, <span>4</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>]]], <span>5</span>, <span>"string"</span>, { <span>name</span>: <span>"弹铁蛋同学"</span> }];
+<span>// 遍历数组的方法有太多，本文只枚举常用的几种</span>
+<span>// for 循环</span>
+<span>for</span> (<span>let</span> i = <span>0</span>; i &lt; arr.length; i++) {
+  <span>console</span>.log(arr[i]);
 }
+<span>// for...of</span>
+<span>for</span> (<span>let</span> value <span>of</span> arr) {
+  <span>console</span>.log(value);
+}
+<span>// for...in</span>
+<span>for</span> (<span>let</span> i <span>in</span> arr) {
+  <span>console</span>.log(arr[i]);
+}
+<span>// forEach 循环</span>
+arr.forEach(<span><span>value</span> =&gt;</span> {
+  <span>console</span>.log(value);
+});
+<span>// entries（）</span>
+<span>for</span> (<span>let</span> [index, value] <span>of</span> arr.entries()) {
+  <span>console</span>.log(value);
+}
+<span>// keys()</span>
+<span>for</span> (<span>let</span> index <span>of</span> arr.keys()) {
+  <span>console</span>.log(arr[index]);
+}
+<span>// values()</span>
+<span>for</span> (<span>let</span> value <span>of</span> arr.values()) {
+  <span>console</span>.log(value);
+}
+<span>// reduce()</span>
+arr.reduce(<span>(<span>pre, cur</span>) =&gt;</span> {
+  <span>console</span>.log(cur);
+}, []);
+<span>// map()</span>
+arr.map(<span><span>value</span> =&gt;</span> <span>console</span>.log(value));
+<span class="copy-code-btn">复制代码</span></code></pre><p>只要是能够遍历数组取到数组中每一个元素的方法，都是一种可行的解决方案。</p>
+<h4 data-id="heading-7">判断元素是数组的方案</h4>
+<ul>
+<li><code>instanceof</code></li>
+<li><code>constructor</code></li>
+<li><code>Object.prototype.toString</code></li>
+<li><code>isArray</code></li>
+</ul>
+<pre><code lang="javascript" class="copyable"><span>const</span> arr = [<span>1</span>, <span>2</span>, <span>3</span>, <span>4</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>]]], <span>5</span>, <span>"string"</span>, { <span>name</span>: <span>"弹铁蛋同学"</span> }];
+arr <span>instanceof</span> <span>Array</span>
+<span>// true</span>
+arr.constructor === <span>Array</span>
+<span>// true</span>
+<span>Object</span>.prototype.toString.call(arr) === <span>'[object Array]'</span>
+<span>// true</span>
+<span>Array</span>.isArray(arr)
+<span>// true</span>
+<span class="copy-code-btn">复制代码</span></code></pre><p><strong>说明</strong>：</p>
+<ul>
+<li>
+<p><code>instanceof</code> 操作符是假定只有一种全局环境，如果网页中包含多个框架，多个全局环境，如果你从一个框架向另一个框架传入一个数组，那么传入的数组与在第二个框架中原生创建的数组分别具有各自不同的构造函数。（所以在这种情况下会不准确）</p>
+</li>
+<li>
+<p><code>typeof</code> 操作符对数组取类型将返回 <code>object</code></p>
+</li>
+<li>
+<p>因为<code>constructor</code> 可以被重写，所以不能确保一定是数组。</p>
+<pre><code lang="javascript" class="copyable"><span>const</span> str = <span>'abc'</span>;
+str.constructor = <span>Array</span>;
+str.constructor === <span>Array</span> 
+<span>// true</span>
+<span class="copy-code-btn">复制代码</span></code></pre></li>
+</ul>
+<h4 data-id="heading-8">将数组的元素展开一层的方案</h4>
+<ul>
+<li>扩展运算符 + <code>concat</code></li>
+</ul>
+<p><code>concat()</code> 方法用于合并两个或多个数组，在拼接的过程中加上扩展运算符会展开一层数组。详细见下面的代码。</p>
+<ul>
+<li><code>conca</code>t +<code>apply</code></li>
+</ul>
+<p>主要是利用 <code>apply</code> 在绑定作用域时，传入的第二个参数是一个数组或者类数组对象，其中的数组元素将作为单独的参数传给 <code>func</code> 函数。也就是在调用 <code>apply</code> 函数的过程中，会将传入的数组一个一个的传入到要执行的函数中，也就是相当对数组进行了一层的展开。</p>
+<ul>
+<li><code>toString</code>  + <code>split</code></li>
+</ul>
+<p>不推荐使用 <code>toString</code> + <code>split</code> 方法，因为操作字符串是和危险的事情，在<a target="_blank" href="https://juejin.cn/post/6844904016212672519" title="https://juejin.cn/post/6844904016212672519">上一文章</a>中我做了一个操作字符串的案例还被许多小伙伴们批评了。如果数组中的元素所有都是数字的话，<code>toString</code> +<code>split</code> 是可行的，并且是一步搞定。</p>
+<pre><code lang="javascript" class="copyable"><span>const</span> arr = [<span>1</span>, <span>2</span>, <span>3</span>, <span>4</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>]]], <span>5</span>, <span>"string"</span>, { <span>name</span>: <span>"弹铁蛋同学"</span> }];
+<span>// 扩展运算符 + concat</span>
+[].concat(...arr)
+<span>// [1, 2, 3, 4, 1, 2, 3, [1, 2, 3, [1, 2, 3]], 5, "string", { name: "弹铁蛋同学" }];</span>
 
-<span>const</span> arr = [<span>3</span>, <span>4</span>, <span>5</span>];
-<span class="copy-code-btn">复制代码</span></code></pre>
-        <p>一个封装的延迟函数，然后一个装有3,4,5的数组，需求就是在开始执行时依次等待3, 4, 5秒，并在之后打印对应输出</p>
-        <pre><code lang="shell" class="copyable">wait 3s // 等待3s
+<span>// concat + apply</span>
+[].concat.apply([], arr);
+<span>// [1, 2, 3, 4, 1, 2, 3, [1, 2, 3, [1, 2, 3]], 5, "string", { name: "弹铁蛋同学" }];</span>
 
-execute
-wait 4s // 等待4s
+<span>// toString  + split</span>
+<span>const</span> arr2 =[<span>1</span>, <span>2</span>, <span>3</span>, <span>4</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>]]]]
+arr2.toString().split(<span>','</span>).map(<span><span>v</span>=&gt;</span><span>parseInt</span>(v))
+<span>// [1, 2, 3, 4, 1, 2, 3, 1, 2, 3, 1, 2, 3]</span>
+<span class="copy-code-btn">复制代码</span></code></pre><p>总结完要解决的三大困难，那我们就可以非常轻松的实现一版数组拍平 <code>flat</code> 函数了。</p>
+<pre><code lang="javascript" class="copyable"><span>const</span> arr = [<span>1</span>, <span>2</span>, <span>3</span>, <span>4</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>]]], <span>5</span>, <span>"string"</span>, { <span>name</span>: <span>"弹铁蛋同学"</span> }];
+<span>// concat + 递归</span>
+<span><span>function</span> <span>flat</span>(<span>arr</span>) </span>{
+  <span>let</span> arrResult = [];
+  arr.forEach(<span><span>item</span> =&gt;</span> {
+    <span>if</span> (<span>Array</span>.isArray(item)) {
+      arrResult = arrResult.concat(<span>arguments</span>.callee(item));   <span>// 递归</span>
+      <span>// 或者用扩展运算符</span>
+      <span>// arrResult.push(...arguments.callee(item));</span>
+    } <span>else</span> {
+      arrResult.push(item);
+    }
+  });
+  <span>return</span> arrResult;
+}
+flat(arr)
+<span>// [1, 2, 3, 4, 1, 2, 3, 1, 2, 3, 1, 2, 3, 5, "string", { name: "弹铁蛋同学" }];</span>
+<span class="copy-code-btn">复制代码</span></code></pre><p>到这里，恭喜你成功得到了面试官对你手撕代码能力的基本认可🎉。但是面试官往往会不止于此，将继续考察面试者的各种能力。</p>
+<h3 data-id="heading-9">第二问：用 <code>reduce</code> 实现 <code>flat</code> 函数</h3>
+<p>我见过很多的面试官都很喜欢点名道姓的要面试者直接用 <code>reduce</code> 去实现 <code>flat</code> 函数。想知道为什么？文章后半篇我们考虑数组空位的情况的时候就知道为啥了。其实思路也是一样的。</p>
+<pre><code lang="javascript" class="copyable"><span>const</span> arr = [<span>1</span>, <span>2</span>, <span>3</span>, <span>4</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>]]], <span>5</span>, <span>"string"</span>, { <span>name</span>: <span>"弹铁蛋同学"</span> }]
 
-execute
-wait 5s // 等待5s
+<span>// 首先使用 reduce 展开一层</span>
+arr.reduce(<span>(<span>pre, cur</span>) =&gt;</span> pre.concat(cur), []);
+<span>// [1, 2, 3, 4, 1, 2, 3, [1, 2, 3, [1, 2, 3]], 5, "string", { name: "弹铁蛋同学" }];</span>
 
-execute
-<span class="copy-code-btn">复制代码</span></code></pre>
-        <h3 data-id="heading-2">方式1. reduce</h3>
-        <pre><code lang="js" class="copyable">arr.reduce(<span>(<span>s, v</span>) =&gt;</span> {
-  <span>return</span> s.then(<span><span>()</span> =&gt;</span> delay(v))
-}, <span>Promise</span>.resolve())
-<span class="copy-code-btn">复制代码</span></code></pre>
-        <p>比较简单和常见的方式</p>
-        <h3 data-id="heading-3">方式2. async + 循环 + await</h3>
-        <pre><code lang="js" class="copyable">(
-  <span>async</span> <span><span>function</span> (<span></span>) </span>{
-    <span>for</span> (<span>const</span> v <span>of</span> arr) {
-      <span>await</span> delay(v)
+<span>// 用 reduce 展开一层 + 递归</span>
+<span>const</span> flat = <span><span>arr</span> =&gt;</span> {
+  <span>return</span> arr.reduce(<span>(<span>pre, cur</span>) =&gt;</span> {
+    <span>return</span> pre.concat(<span>Array</span>.isArray(cur) ? flat(cur) : cur);
+  }, []);
+};
+<span>// [1, 2, 3, 4, 1, 2, 3, 1, 2, 3, 1, 2, 3, 5, "string", { name: "弹铁蛋同学" }];</span>
+<span class="copy-code-btn">复制代码</span></code></pre><h3 data-id="heading-10">第三问：使用栈的思想实现 <code>flat</code> 函数</h3>
+<pre><code lang="javascript" class="copyable"><span>// 栈思想</span>
+<span><span>function</span> <span>flat</span>(<span>arr</span>) </span>{
+  <span>const</span> result = []; 
+  <span>const</span> stack = [].concat(arr);  <span>// 将数组元素拷贝至栈，直接赋值会改变原数组</span>
+  <span>//如果栈不为空，则循环遍历</span>
+  <span>while</span> (stack.length !== <span>0</span>) {
+    <span>const</span> val = stack.pop(); 
+    <span>if</span> (<span>Array</span>.isArray(val)) {
+      stack.push(...val); <span>//如果是数组再次入栈，并且展开了一层</span>
+    } <span>else</span> {
+      result.unshift(val); <span>//如果不是数组就将其取出来放入结果数组中</span>
     }
   }
-)()
-<span class="copy-code-btn">复制代码</span></code></pre>
-        <p>本质上使用了async/await的功能</p>
-        <h3 data-id="heading-4">方式3. 普通循环</h3>
-        <p>其实仔细想想方式1的本质是使用一个中间变量（上一次执行结果）来保存<code>链式Promise</code>, 那我们举一反三， 换别的循环也可以实现</p>
-        <pre><code lang="js" class="copyable"><span>let</span> p = <span>Promise</span>.resolve()
-<span>for</span> (<span>const</span> i <span>of</span> arr) {
-  p = p.then(<span><span>()</span> =&gt;</span> delay(i))
+  <span>return</span> result;
 }
-<span class="copy-code-btn">复制代码</span></code></pre>
-        <p>理论上所有循环方式都能实现，只要找到一个保存<code>链式Promise</code>的地方，闭包也好，参数也好。</p>
-        <p>其实使用while循环时遇到一些坑，例如这样写。</p>
-        <pre><code lang="js" class="copyable"><span>let</span> i
-<span>let</span> p = <span>Promise</span>.resolve()
-<span>while</span> (i = arr.shift()) {
-  p = p.then(<span><span>()</span> =&gt;</span> delay(i))
+<span>const</span> arr = [<span>1</span>, <span>2</span>, <span>3</span>, <span>4</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>]]], <span>5</span>, <span>"string"</span>, { <span>name</span>: <span>"弹铁蛋同学"</span> }]
+flat(arr)
+<span>// [1, 2, 3, 4, 1, 2, 3, 1, 2, 3, 1, 2, 3, 5, "string", { name: "弹铁蛋同学" }];</span>
+<span class="copy-code-btn">复制代码</span></code></pre><h3 data-id="heading-11">第四问：通过传入整数参数控制“拉平”层数</h3>
+<pre><code lang="javascript" class="copyable"><span>// reduce + 递归</span>
+<span><span>function</span> <span>flat</span>(<span>arr, num = <span>1</span></span>) </span>{
+  <span>return</span> num &gt; <span>0</span>
+    ? arr.reduce(
+        <span>(<span>pre, cur</span>) =&gt;</span>
+          pre.concat(<span>Array</span>.isArray(cur) ? flat(cur, num - <span>1</span>) : cur),
+        []
+      )
+    : arr.slice();
 }
-<span class="copy-code-btn">复制代码</span></code></pre>
-        <p>思路没啥问题，问题就在于i放在外层时实际上每次都被改动，这和一道经典的面试题一样</p>
-        <pre><code lang="js" class="copyable"><span>for</span>(<span>var</span> i = <span>0</span>, i &lt; <span>5</span>, i++) {
-  setTimeout(<span><span>()</span> =&gt;</span> {
-    <span>console</span>.log(i)
-  }, i * <span>1000</span>)
-}
-<span class="copy-code-btn">复制代码</span></code></pre>
-        <p>事实上他们都会输出5。所以对于while循环，我们需要在内部也保存一份，最后我改成这样，感觉有点蠢，不过也没想到其他办法</p>
-        <pre><code lang="js" class="copyable"><span>let</span> i
-<span>let</span> p = <span>Promise</span>.resolve()
-<span>while</span> (i = arr.shift()) {
-  <span>let</span> s = i
-  p = p.then(<span><span>()</span> =&gt;</span> delay(s))
-}
-<span class="copy-code-btn">复制代码</span></code></pre>
-        <h3 data-id="heading-5">方式4. 递归</h3>
-        <p>这是面试官提供的思路，也提到了<code>koa</code>，其实<code>koa</code>自己也有研究，其中洋葱模型来自于<code>koa-compose</code>库。</p>
-        <pre><code lang="js" class="copyable"><span><span>function</span> <span>dispatch</span>(<span>i, p = Promise.resolve(</span>)) </span>{
-  <span>if</span> (!arr[i]) <span>return</span> <span>Promise</span>.resolve()
-  <span>return</span> p.then(<span><span>()</span> =&gt;</span> dispatch(i + <span>1</span>, delay(arr[i])))
-}
-dispatch(<span>0</span>)
-<span class="copy-code-btn">复制代码</span></code></pre>
-        <h3 data-id="heading-6">方式5. for await of</h3>
-        <p>
-          通过查阅了<code>for await of</code>的规则，其实<code>for await of</code>和<code>for of</code>规则类似，只需要实现一个内部<code>[Symbol.asyncIterator]</code>方法即可
-        </p>
-        <pre><code lang="js" class="copyable"><span><span>function</span> <span>createAsyncIterable</span>(<span>arr</span>) </span>{
-  <span>return</span> {
-    [<span>Symbol</span>.asyncIterator]() {
-      <span>return</span> {
-        <span>i</span>: <span>0</span>,
-        next() {
-          <span>if</span> (<span>this</span>.i &lt; arr.length) {
-            <span>return</span> delay(arr[<span>this</span>.i]).then(<span><span>()</span> =&gt;</span> ({ <span>value</span>: <span>this</span>.i++, <span>done</span>: <span>false</span> }));
-          }
-
-          <span>return</span> <span>Promise</span>.resolve({ <span>done</span>: <span>true</span> });
-        }
-      };
+<span>const</span> arr = [<span>1</span>, <span>2</span>, <span>3</span>, <span>4</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>]]], <span>5</span>, <span>"string"</span>, { <span>name</span>: <span>"弹铁蛋同学"</span> }]
+flat(arr, <span>Infinity</span>);
+<span>// [1, 2, 3, 4, 1, 2, 3, 1, 2, 3, 1, 2, 3, 5, "string", { name: "弹铁蛋同学" }];</span>
+<span class="copy-code-btn">复制代码</span></code></pre><h3 data-id="heading-12">第五问：使用 <code>Generator</code> 实现 <code>flat</code> 函数</h3>
+<pre><code lang="javascript" class="copyable"><span><span>function</span>* <span>flat</span>(<span>arr, num</span>) </span>{
+  <span>if</span> (num === <span>undefined</span>) num = <span>1</span>;
+  <span>for</span> (<span>const</span> item <span>of</span> arr) {
+    <span>if</span> (<span>Array</span>.isArray(item) &amp;&amp; num &gt; <span>0</span>) {   <span>// num &gt; 0</span>
+      <span>yield</span>* flat(item, num - <span>1</span>);
+    } <span>else</span> {
+      <span>yield</span> item;
     }
   }
 }
-
-(<span>async</span> <span><span>function</span> (<span></span>) </span>{
-  <span>for</span> <span>await</span> (i <span>of</span> createAsyncIterable(arr)) { }
-})();
-<span class="copy-code-btn">复制代码</span></code></pre>
-        <p>先创建出一个可异步迭代对象，然后丢到<code>for await of</code>循环即可</p>
-        <h3 data-id="heading-7">方式6. generator</h3>
-        <pre><code lang="js" class="copyable"><span><span>function</span>* <span>gen</span>(<span></span>) </span>{
-  <span>for</span> (<span>const</span> v <span>of</span> arr) {
-    <span>yield</span> delay(v)
+<span>const</span> arr = [<span>1</span>, <span>2</span>, <span>3</span>, <span>4</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>]]], <span>5</span>, <span>"string"</span>, { <span>name</span>: <span>"弹铁蛋同学"</span> }]
+<span>// 调用 Generator 函数后，该函数并不执行，返回的也不是函数运行结果，而是一个指向内部状态的指针对象。</span>
+<span>// 也就是遍历器对象（Iterator Object）。所以我们要用一次扩展运算符得到结果</span>
+[...flat(arr, <span>Infinity</span>)]    
+<span>// [1, 2, 3, 4, 1, 2, 3, 1, 2, 3, 1, 2, 3, 5, "string", { name: "弹铁蛋同学" }];</span>
+<span class="copy-code-btn">复制代码</span></code></pre><h3 data-id="heading-13">第六问：实现在原型链上重写 <code>flat</code> 函数</h3>
+<pre><code lang="javascript" class="copyable"><span>Array</span>.prototype.fakeFlat = <span><span>function</span>(<span>num = <span>1</span></span>) </span>{
+  <span>if</span> (!<span>Number</span>(num) || <span>Number</span>(num) &lt; <span>0</span>) {
+    <span>return</span> <span>this</span>;
   }
-}
-
-<span><span>function</span> <span>run</span>(<span>gen</span>) </span>{
-  <span>const</span> g = gen()
-
-  <span><span>function</span> <span>next</span>(<span>data</span>) </span>{
-    <span>const</span> result = g.next(data)
-    <span>if</span> (result.done) <span>return</span> result.value
-    result.value.then(<span><span>function</span>(<span>data</span>) </span>{
-      next(data)
-    })
+  <span>let</span> arr = <span>this</span>.concat();    <span>// 获得调用 fakeFlat 函数的数组</span>
+  <span>while</span> (num &gt; <span>0</span>) {           
+    <span>if</span> (arr.some(<span><span>x</span> =&gt;</span> <span>Array</span>.isArray(x))) {
+      arr = [].concat.apply([], arr);	<span>// 数组中还有数组元素的话并且 num &gt; 0，继续展开一层数组 </span>
+    } <span>else</span> {
+      <span>break</span>; <span>// 数组中没有数组元素并且不管 num 是否依旧大于 0，停止循环。</span>
+    }
+    num--;
   }
+  <span>return</span> arr;
+};
+<span>const</span> arr = [<span>1</span>, <span>2</span>, <span>3</span>, <span>4</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>, [<span>1</span>, <span>2</span>, <span>3</span>]]], <span>5</span>, <span>"string"</span>, { <span>name</span>: <span>"弹铁蛋同学"</span> }]
+arr.fakeFlat(<span>Infinity</span>)
+<span>// [1, 2, 3, 4, 1, 2, 3, 1, 2, 3, 1, 2, 3, 5, "string", { name: "弹铁蛋同学" }];</span>
+<span class="copy-code-btn">复制代码</span></code></pre><h3 data-id="heading-14">第七问：考虑数组空位的情况</h3>
+<p>由最开始我们总结的 <code>flat</code> 特性知道，<code>flat</code> 函数执行是会跳过空位的。ES5 大多数数组方法对空位的处理都会选择跳过空位包括：<code>forEach()</code>, <code>filter()</code>, <code>reduce()</code>, <code>every()</code> 和 <code>some()</code> 都会跳过空位。</p>
+<p>所以我们可以利用上面几种方法来实现 flat 跳过空位的特性</p>
+<pre><code lang="javascript" class="copyable"><span>// reduce + 递归</span>
+<span>Array</span>.prototype.fakeFlat = <span><span>function</span>(<span>num = <span>1</span></span>) </span>{
+  <span>if</span> (!<span>Number</span>(num) || <span>Number</span>(num) &lt; <span>0</span>) {
+    <span>return</span> <span>this</span>;
+  }
+  <span>let</span> arr = [].concat(<span>this</span>);
+  <span>return</span> num &gt; <span>0</span>
+    ? arr.reduce(
+        <span>(<span>pre, cur</span>) =&gt;</span>
+          pre.concat(<span>Array</span>.isArray(cur) ? cur.fakeFlat(--num) : cur),
+        []
+      )
+    : arr.slice();
+};
+<span>const</span> arr = [<span>1</span>, [<span>3</span>, <span>4</span>], , ,];
+arr.fakeFlat()
+<span>// [1, 3, 4]</span>
 
-  next()
-}
+<span>// foEach + 递归</span>
+<span>Array</span>.prototype.fakeFlat = <span><span>function</span>(<span>num = <span>1</span></span>) </span>{
+  <span>if</span> (!<span>Number</span>(num) || <span>Number</span>(num) &lt; <span>0</span>) {
+    <span>return</span> <span>this</span>;
+  }
+  <span>let</span> arr = [];
+  <span>this</span>.forEach(<span><span>item</span> =&gt;</span> {
+    <span>if</span> (<span>Array</span>.isArray(item)) {
+      arr = arr.concat(item.fakeFlat(--num));
+    } <span>else</span> {
+      arr.push(item);
+    }
+  });
+  <span>return</span> arr;
+};
+<span>const</span> arr = [<span>1</span>, [<span>3</span>, <span>4</span>], , ,];
+arr.fakeFlat()
+<span>// [1, 3, 4]</span>
+<span class="copy-code-btn">复制代码</span></code></pre><h3 data-id="heading-15">扩展阅读：<strong>由于空位的处理规则非常不统一，所以建议避免出现空位。</strong></h3>
+<p><strong>ES5 对空位的处理，就非常不一致，大多数情况下会忽略空位。</strong></p>
+<ul>
+<li><code>forEach()</code>, <code>filter()</code>, <code>reduce()</code>, <code>every()</code> 和 <code>some()</code> 都会跳过空位。</li>
+<li><code>map()</code> 会跳过空位，但会保留这个值。</li>
+<li><code>join()</code> 和 <code>toString()</code> 会将空位视为 <code>undefined</code>，而 <code>undefined</code> 和 <code>null</code> 会被处理成空字符串。</li>
+</ul>
+<p><strong>ES6 明确将空位转为 <code>undefined</code>。</strong></p>
+<ul>
+<li><code>entries()</code>、<code>keys()</code>、<code>values()</code>、<code>find()</code>和 <code>findIndex()</code> 会将空位处理成 <code>undefined</code>。</li>
+<li><code>for...of</code> 循环会遍历空位。</li>
+<li><code>fill()</code> 会将空位视为正常的数组位置。</li>
+<li><code>copyWithin()</code> 会连空位一起拷贝。</li>
+<li>扩展运算符（<code>...</code>）也会将空位转为 <code>undefined</code>。</li>
+<li><code>Array.from</code> 方法会将数组的空位，转为 <code>undefined</code>。</li>
+</ul>
+</div>
 
-run(gen)
-<span class="copy-code-btn">复制代码</span></code></pre>
-        <p>先创建一个generator函数，然后再封装一个自执行run函数</p>
-        <h2 data-id="heading-8">后记</h2>
-        <p>一个合格的工程师： 能找到或写出市面上最主流的实现方式</p>
-        <p>一个出色的工程师： 能明白其中的原理，并能举一反三，有自己的思考。</p>
-        <p>与君共勉！</p>
-      </div>
-    </div>
+    <!-- CONTENT END -->
   </div>
 </body>
 </html>
